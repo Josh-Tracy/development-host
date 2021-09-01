@@ -1,0 +1,57 @@
+---
+# tasks file for install_kubectl
+
+# Download the version of kubectl you want
+# the kubectl_version variable is taken from this roles /vars directory
+- name: Download kubectl version
+  get_url:
+    url: https://dl.k8s.io/release/"{{ kubectl_version }}"/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+  tags:
+    - kubectl
+
+- name: Download the checksum for the kubectl version
+  get_url:
+    url: https://dl.k8s.io/"{{ kubectl_version }}"/bin/linux/amd64/kubectl.sha256
+    dest: /usr/loca/bin/kubectl.sha256
+  tags:
+    - kubectl
+
+- name: Validate the binary against the checksum
+  shell: echo "$(<kubectl.sha256) kubectl" | sha256sum --check
+  register: result
+  tags:
+    - kubectl
+
+- debug:
+    var: result
+    verbosity: 2
+  tags:
+    - kubectl
+
+- name: Remove kubectl if the checksum did not match
+  file:
+    path: /usr/local/bin/kubectl
+    state: absent
+  when: "checksum did NOT match" in result.stdout
+  tags:
+    - kubectl
+
+- name: If it passed checksum, then change the permissions on kubectl
+  file:
+    path: /usr/local/bin/kubectl
+    user: root
+    group: root
+    mode: '0755'
+  failed_when: "checksum did NOT match" in result.stdout
+  tags:
+    - kubectl
+  
+
+
+
+
+
+
+
+ 

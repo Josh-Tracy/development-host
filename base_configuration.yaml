@@ -1,0 +1,7 @@
+- name: Install the base configuration for my development host(s)
+  hosts: development
+
+  roles:
+  - hostname
+  - add_users
+  - install_software

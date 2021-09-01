@@ -1,0 +1,20 @@
+---
+# tasks file for add_users
+
+# Add users admin user(s)
+# users are taken from this roles /vars directory
+- name: Add admin(s)
+  user:
+    name: "{{ item.name }}"
+    comment: An Administrator
+    shell: /bin/bash
+    password: "{{ item.password }}"
+    groups: "{{ item.groups }}"
+    append: yes
+    create_home: yes
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+  with_items: "{{ users }}"
+  tags:
+    - add_users

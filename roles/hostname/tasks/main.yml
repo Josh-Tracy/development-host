@@ -1,0 +1,11 @@
+---
+# tasks file for hostname
+
+# Assign hostname(s)
+# hostname is derived from host_vars
+- name: Assign hostname
+  hostname:
+    name: "{{ hostname }}"
+    use: systemd
+  tags:
+    - hostname
