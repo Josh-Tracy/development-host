@@ -1,0 +1,4 @@
+cd/cd
+install nodejs
+hook github into travis site
+create travis.yml in repo
