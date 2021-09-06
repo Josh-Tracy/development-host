@@ -6,3 +6,14 @@
     name:
     - RPi.GPIO
     - openpyxl
+    - molecule[docker]
+  tags:
+    - python_packages
+
+- name: Add ansible molecule path
+  lineinfile:
+    path: ~/.bashrc
+    line: export PATH="$HOME/.local/bin:$PATH"
+    state: present
+  tags:
+    - python_packages

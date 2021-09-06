@@ -10,3 +10,4 @@
   - install_kubectl
   - install_terraform
   - configure_ansible
+  - python_packages
