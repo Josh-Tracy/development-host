@@ -1,0 +1,21 @@
+---
+# tasks file for configure_ansible
+# Sometimes ansible doesn't install the default /etc/ansible/ansible.cfg, so I do it myself with
+# the default settings it would set if it did.
+- name: Create /etc/ansible
+  file:
+    path: /etc/ansible
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - ansible
+
+# Taken from this roles /templates dir
+- name: Place the default ansible.cfg into /etc/ansible
+  copy:
+    src: files/ansible.cfg
+    dest: /etc/ansible/ansible.cfg
+  tags:
+    - ansible

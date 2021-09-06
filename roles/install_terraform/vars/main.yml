@@ -1,2 +1,3 @@
 ---
 # vars file for install_terraform
+terraform_version: 1.0.6

@@ -1,16 +1,38 @@
 ---
 # tasks file for install_eksctl
+# Install the latest version of eksctl
+- name: Find out if this is a raspberry pi or not
+  shell: uname -r
+  register: raspi_status
+  tags:
+    - eksctl
 
+- name: AMD64 eksctl Install
+  block:
+    - name: Download eksctl version
+      get_url:
+        url: https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz
+        dest: /tmp
+
+    - name: Untar the binary to somewhere
+      unarchive:
+        src: /tmp/eksctl_Linux_amd64.tar.gz
+        dest: /usr/local/bin
+  tags:
+    - eksctl
+  when: ('raspi' not in raspi_status.stdout)
+
+# ARM64 install
 - name: Download eksctl version
   get_url:
-    url: https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz
+    url: https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_Linux_arm64.tar.gz
     dest: /tmp
   tags:
     - eksctl
 
 - name: Untar the binary to somewhere
   unarchive:
-    src: /tmp/eksctl_Linux_amd64.tar.gz
+    src: /tmp/eksctl_Linux_arm64.tar.gz
     dest: /usr/local/bin
   tags:
     - eksctl
@@ -21,8 +43,8 @@
   tags:
     - eksctl
 
-- debug:
+- name: 
+  debug:
     var: result
-    verbosity: 2
   tags:
     - eksctl

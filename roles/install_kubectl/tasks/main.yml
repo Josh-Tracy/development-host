@@ -3,29 +3,60 @@
 
 # Download the version of kubectl you want
 # the kubectl_version variable is taken from this roles /vars directory
-- name: Download kubectl version
-  get_url:
-    url: https://dl.k8s.io/release/"{{ kubectl_version }}"/bin/linux/amd64/kubectl
-    dest: /usr/local/bin/kubectl
+
+- name: Find out if this is a raspberry pi or not
+  shell: uname -r
+  register: raspi_status
   tags:
     - kubectl
 
-- name: Download the checksum for the kubectl version
-  get_url:
-    url: https://dl.k8s.io/"{{ kubectl_version }}"/bin/linux/amd64/kubectl.sha256
-    dest: /usr/loca/bin/kubectl.sha256
+# AMD64 non-pi install
+- name: AMD64 kubectl Install
+  block:
+    - name: Download kubectl version
+      get_url:
+        url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+
+    - name: Download the checksum for the kubectl version
+      get_url:
+        url: https://dl.k8s.io/{{ kubectl_version }}/bin/linux/amd64/kubectl.sha256
+        dest: /usr/local/bin/kubectl.sha256
+ 
+    - name: Validate the binary against the checksum
+      command:
+        cmd: echo "$(</usr/local/bin/kubectl.sha256) /usr/local/bin/kubectl" | sha256sum --check
+      register: result
+  when: ('raspi' not in raspi_status.stdout)
   tags:
     - kubectl
+    - amd64
 
-- name: Validate the binary against the checksum
-  shell: echo "$(<kubectl.sha256) kubectl" | sha256sum --check
-  register: result
+# ARM64 Raspberry-pi install
+- name: ARM64 kubectl install
+  block:
+    - name: Download kubectl version
+      get_url:
+        url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/arm64/kubectl
+        dest: /usr/local/bin/kubectl
+
+    - name: Download the checksum for the kubectl version
+      get_url:
+        url: https://dl.k8s.io/{{ kubectl_version }}/bin/linux/arm64/kubectl.sha256
+        dest: /usr/local/bin/kubectl.sha256
+ 
+    - name: Validate the binary against the checksum
+      command:
+        cmd: echo "$(</usr/local/bin/kubectl.sha256) /usr/local/bin/kubectl" | sha256sum --check
+      register: result
+  when: ('raspi' in raspi_status.stdout)
   tags:
     - kubectl
+    - arm64
 
-- debug:
+- name: 
+  debug:
     var: result
-    verbosity: 2
   tags:
     - kubectl
 
@@ -33,7 +64,7 @@
   file:
     path: /usr/local/bin/kubectl
     state: absent
-  when: "checksum did NOT match" in result.stdout
+  when: '"checksum did NOT match" in result.stdout'
   tags:
     - kubectl
 
@@ -42,8 +73,8 @@
     path: /usr/local/bin/kubectl
     user: root
     group: root
-    mode: '0755'
-  failed_when: "checksum did NOT match" in result.stdout
+    mode: 0755
+  failed_when: '"checksum did NOT match" in result.stdout'
   tags:
     - kubectl
   

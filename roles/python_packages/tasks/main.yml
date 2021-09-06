@@ -1,0 +1,8 @@
+---
+# tasks file for python_packages
+# Install python packages
+- name: Install python packages
+  pip:
+    name:
+    - RPi.GPIO
+    - openpyxl

@@ -1,6 +1,14 @@
 ---
 # tasks file for install_software
 # Install required software for ubuntu
+
+- name: Update first
+  apt:
+    update_cache: yes
+  when: ansible_facts['distribution'] == "Ubuntu"
+  tags:
+    - package_installs
+
 - name: Install development software for Ubuntu
   apt:
     pkg:
@@ -8,16 +16,18 @@
     - awscli
     - curl
     - git
-    - net-utils
+    - net-tools
     - pip
-    - pip3
     - python2
     - python3
     - rpm
     - sshpass
     - wget
-  update_cache: yes
-  when: ansible_facts'[distribution'] == "Ubuntu"
+    - whois
+    state: latest
+  when: ansible_facts['distribution'] == "Ubuntu"
+  tags:
+    - package_installs
 
 # Redhat
 - name: Install development software for RedHat
@@ -27,15 +37,17 @@
     - awscli
     - curl
     - git
-    - net-utils
+    - net-tools
     - pip
-    - pip3
     - python2
     - python3
     - rpm
+    - software-properties-common
     - sshpass
     - wget
-  state: latest
-  when: ansible_facts'[distribution'] == "Redhat"
-
+    - whois
+    state: latest
+  when: ansible_facts['distribution'] == "Redhat"
+  tags:
+    - package_installs
 

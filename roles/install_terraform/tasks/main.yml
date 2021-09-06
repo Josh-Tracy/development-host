@@ -1,2 +1,42 @@
 ---
 # tasks file for install_terraform
+# Install terraform
+# terraform_version is taken from this roles /vars directory
+
+- name: Find out if this is a raspberry pi or not
+  shell: uname -r
+  register: raspi_status
+  tags:
+    - terraform
+
+# AMD64 Install
+- name: terraform install
+  unarchive:
+    src: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip
+    dest: /usr/bin
+    remote_src: True
+  when: ('raspi' not in raspi_status.stdout)
+  tags:
+    - terraform
+
+# ARM64 Install
+- name: terraform install
+  unarchive:
+    src: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_arm64.zip
+    dest: /usr/bin
+    remote_src: True
+  when: ('raspi' in raspi_status.stdout)
+  tags:
+    - terraform
+
+- name: Verify Install
+  shell: terraform --version
+  register: result
+  tags:
+    - terraform
+
+- name: Verify Install
+  debug:
+    var: result
+  tags:
+    - terraform

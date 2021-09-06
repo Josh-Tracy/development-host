@@ -1,7 +1,12 @@
 - name: Install the base configuration for my development host(s)
   hosts: development
+  become: true
 
   roles:
   - hostname
   - add_users
   - install_software
+  - install_eksctl
+  - install_kubectl
+  - install_terraform
+  - configure_ansible
